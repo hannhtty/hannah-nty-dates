@@ -1,0 +1,369 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>🐱 Hannah & Nty's Adventure Book 💕</title>
+
+<style>
+
+body{
+    font-family:'Trebuchet MS',sans-serif;
+    background:linear-gradient(#ffe4ec,#fff7f9);
+    margin:0;
+    padding:20px;
+    color:#444;
+}
+
+.container{
+    max-width:1000px;
+    margin:auto;
+}
+
+.card{
+    background:white;
+    border-radius:20px;
+    padding:20px;
+    margin-bottom:20px;
+    box-shadow:0 4px 12px rgba(0,0,0,.08);
+}
+
+h1{
+    text-align:center;
+    color:#ff6fa3;
+}
+
+.subtitle{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+button{
+    border:none;
+    border-radius:15px;
+    padding:12px 18px;
+    margin:6px;
+    cursor:pointer;
+    font-size:15px;
+    background:#ffb6c1;
+}
+
+button:hover{
+    transform:scale(1.05);
+}
+
+#result{
+    text-align:center;
+    font-size:28px;
+    font-weight:bold;
+    color:#ff5a8a;
+    min-height:70px;
+}
+
+.progress{
+    width:100%;
+    height:25px;
+    background:#eee;
+    border-radius:20px;
+    overflow:hidden;
+}
+
+.progress-fill{
+    height:100%;
+    background:#ff9fcb;
+    width:0%;
+}
+
+.item{
+    margin:6px 0;
+    padding:8px;
+    border-radius:10px;
+}
+
+.done{
+    text-decoration:line-through;
+    color:gray;
+}
+
+.cat{
+    font-size:38px;
+    text-align:center;
+}
+
+.message{
+    text-align:center;
+    color:#888;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<div class="cat">🐱💕🐾</div>
+
+<h1>Hannah & Nty's Adventure Book</h1>
+
+<p class="subtitle">
+Collect memories instead of Pokémon.
+</p>
+
+<div id="result">
+Press a button!
+</div>
+
+<p class="message" id="catMessage">
+🐱 Meow~
+</p>
+
+<div style="text-align:center">
+
+<button onclick="drawAny()">🎲 Any Date</button>
+
+<button onclick="drawCategory('food')">
+🍜 Food
+</button>
+
+<button onclick="drawCategory('romantic')">
+💕 Romantic
+</button>
+
+<button onclick="drawCategory('cheap')">
+💸 Cheap
+</button>
+
+<button onclick="drawCategory('ubc')">
+🏫 UBC
+</button>
+
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>🐾 Progress</h2>
+
+<div class="progress">
+<div class="progress-fill" id="progressBar"></div>
+</div>
+
+<p id="progressText"></p>
+
+</div>
+
+<div class="card">
+
+<h2>✅ Adventure List</h2>
+
+<div id="activities"></div>
+
+</div>
+
+</div>
+
+<script>
+
+const activities = [
+
+{ name:"SoapBBox Christmas Market", cat:"romantic"},
+{ name:"Christmas Market", cat:"romantic"},
+{ name:"Victoria Getaway", cat:"romantic"},
+{ name:"Huntingdon Hotel", cat:"romantic"},
+{ name:"Spa Date", cat:"romantic"},
+{ name:"Whistler Day Trip", cat:"romantic"},
+{ name:"Richmond Farm Animal Petting", cat:"cheap"},
+{ name:"Oakridge Mall", cat:"cheap"},
+{ name:"Metrotown Shopping", cat:"cheap"},
+{ name:"Surrey Seafood Boil", cat:"food"},
+{ name:"AYCE Seafood", cat:"food"},
+{ name:"$5 Lobster Roll", cat:"food"},
+{ name:"$2 Oyster Special", cat:"food"},
+{ name:"Richmond Food Crawl", cat:"food"},
+{ name:"Yorks", cat:"food"},
+{ name:"Aberdeen Mochi", cat:"food"},
+{ name:"Killer Ice Cream", cat:"food"},
+{ name:"Coquitlam Ice Cream Trip", cat:"food"},
+{ name:"Famous Ice Cream #1", cat:"food"},
+{ name:"Famous Ice Cream #2", cat:"food"},
+{ name:"UBC Indoor Activities", cat:"ubc"},
+{ name:"UBC Club Event", cat:"ubc"},
+{ name:"Sauder 8 Ball", cat:"ubc"},
+{ name:"Study Date", cat:"ubc"},
+{ name:"Campus Sunset Walk", cat:"ubc"},
+{ name:"Pickleball", cat:"cheap"},
+{ name:"Board Game Cafe", cat:"cheap"},
+{ name:"Monopoly Party", cat:"romantic"},
+{ name:"Birthday Party", cat:"romantic"},
+{ name:"Gym Together", cat:"cheap"},
+{ name:"Salvation Army Volunteering", cat:"cheap"},
+{ name:"Beach Walk", cat:"cheap"},
+{ name:"Coal Harbour Night Walk", cat:"romantic"},
+{ name:"Canada Place Lights", cat:"romantic"},
+{ name:"Bubble Tea Date", cat:"cheap"},
+{ name:"Cafe Hopping", cat:"cheap"},
+{ name:"Movie Night", cat:"cheap"},
+{ name:"Cook Dinner Together", cat:"romantic"},
+{ name:"Deep Cove", cat:"romantic"},
+{ name:"Lynn Canyon", cat:"cheap"},
+{ name:"Granville Island", cat:"cheap"},
+{ name:"Steveston Village", cat:"cheap"},
+{ name:"Chinatown & Fan Tan Alley", cat:"cheap"},
+{ name:"New Year's Eve Downtown", cat:"romantic"},
+{ name:"Hot Chocolate Date", cat:"romantic"},
+{ name:"Kerrisdale Walk", cat:"cheap"},
+{ name:"Science World", cat:"cheap"},
+{ name:"Olympic Village Walk", cat:"cheap"},
+{ name:"Main Street Thrifting", cat:"cheap"}
+
+];
+
+let completed =
+JSON.parse(localStorage.getItem("completed"))
+|| [];
+
+const catMsgs = [
+"🐱 Purrfect choice!",
+"🐾 The cat gods have spoken.",
+"💕 Go make memories.",
+"😺 Adventure unlocked.",
+"🍣 Also buy snacks.",
+"✨ Main character moment."
+];
+
+function save(){
+localStorage.setItem(
+"completed",
+JSON.stringify(completed)
+);
+}
+
+function updateProgress(){
+
+let percent =
+(completed.length / activities.length) * 100;
+
+document.getElementById("progressBar")
+.style.width = percent + "%";
+
+document.getElementById("progressText")
+.innerHTML =
+`🐾 ${completed.length}/${activities.length} completed`;
+}
+
+function render(){
+
+const div =
+document.getElementById("activities");
+
+div.innerHTML="";
+
+activities.forEach(a=>{
+
+let checked =
+completed.includes(a.name);
+
+let item =
+document.createElement("div");
+
+item.className =
+checked ? "item done" : "item";
+
+item.innerHTML=`
+<input
+type="checkbox"
+${checked ? "checked":""}
+onchange="toggle('${a.name}')">
+${a.name}
+`;
+
+div.appendChild(item);
+
+});
+
+updateProgress();
+}
+
+function toggle(name){
+
+if(completed.includes(name))
+completed =
+completed.filter(x=>x!==name);
+
+else
+completed.push(name);
+
+save();
+render();
+
+}
+
+function randomFrom(list){
+
+return list[
+Math.floor(
+Math.random()*list.length
+)
+];
+
+}
+
+function showResult(activity){
+
+document.getElementById("result")
+.innerHTML =
+"✨ " + activity;
+
+document.getElementById("catMessage")
+.innerHTML =
+randomFrom(catMsgs);
+
+}
+
+function drawAny(){
+
+let remaining =
+activities.filter(
+a => !completed.includes(a.name)
+);
+
+if(!remaining.length){
+showResult("🎉 Everything completed!");
+return;
+}
+
+showResult(
+randomFrom(remaining).name
+);
+
+}
+
+function drawCategory(cat){
+
+let remaining =
+activities.filter(
+a =>
+a.cat===cat &&
+!completed.includes(a.name)
+);
+
+if(!remaining.length){
+showResult("🐱 Nothing left here!");
+return;
+}
+
+showResult(
+randomFrom(remaining).name
+);
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
